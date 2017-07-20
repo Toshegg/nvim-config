@@ -18,7 +18,7 @@ set tabstop=2 shiftwidth=2 expandtab
 "
 call plug#begin('~/.vim/plugged')
 " NERD Tree
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree'
 
 " colorscheme
 Plug 'junegunn/seoul256.vim'
@@ -76,6 +76,14 @@ Plug 'alvan/vim-closetag'
 " Emmet vim
 Plug 'mattn/emmet-vim'
 
+" Snippets
+Plug 'SirVer/ultisnips'
+
+" Javascript
+"Plug 'pangloss/vim-javascript'
+
+" Surround
+Plug 'tpope/vim-surround'
 call plug#end()
 
 colo seoul256
@@ -153,6 +161,7 @@ vmap <C-x> "+d
 "
 let g:syntastic_pug_checkers = ['pug_lint']
 let g:syntastic_coffee_checkers = ['coffeelint']
+let g:syntastic_html_checkers=['']
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -169,3 +178,13 @@ set updatetime=250
 " CtrlP settings
 let g:ctrlp_max_files=0
 let g:ctrlp_max_depth=40
+
+" UltiSnips configuration
+
+let g:UltiSnipsExpandTrigger="<C-e>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+let g:UltiSnipsEditSplit="vertical"
+let g:UltiSnipsSnippetDir = '/Users/toshegg/.vim/UltiSnips'
+let g:UltiSnipsSnippetDirectories = ['UltiSnips']
