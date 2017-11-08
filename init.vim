@@ -1,18 +1,14 @@
-noremap j h
-noremap k j
-noremap l k
-noremap ; l
-noremap h ;
-
-noremap <C-w>j :wincmd h<CR>
-noremap <C-w>k :wincmd j<CR>
-noremap <C-w>l :wincmd k<CR>
-noremap <C-w>; :wincmd l<CR>
-
 syntax enable
 set autoindent
 set number
 set tabstop=2 shiftwidth=2 expandtab
+set hidden
+set incsearch
+
+set spelllang=en
+set spellfile=~/.config/nvim/spell/en.utf-8.add
+
+set spell
 
 " Require plugins
 "
@@ -84,11 +80,19 @@ Plug 'SirVer/ultisnips'
 
 " Surround
 Plug 'tpope/vim-surround'
+
+" Swift support
+Plug 'keith/swift.vim'
 call plug#end()
 
 colo seoul256
 
-let g:airline_theme="jellybeans"
+let g:airline_theme="solarized"
+let g:airline_solarized_bg='dark'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#whitespace#mixed_indent_algo = 1
 
 " Indent guides settings
 let g:indent_guides_auto_colors = 0
@@ -110,10 +114,12 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTree
 
 " Tabs manipulation
 "
+let g:NERDTreeMapJumpNextSibling = ''
+let g:NERDTreeMapJumpPrevSibling = ''
 nnoremap <C-t>     :tabnew<CR>
 nnoremap <C-y>     :tabclose<CR>
-nnoremap <C-i> gT
-nnoremap <C-o> gt 
+nnoremap <C-j> gT
+nnoremap <C-k> gt 
 
 function TabLeft()
    let tab_number = tabpagenr() - 1
