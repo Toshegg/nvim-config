@@ -2,7 +2,6 @@
 " Language:	    CSS
 " Maintainer:	    Nikolai Weibull <now@bitwi.se>
 " Latest Revision:  2010-12-22
-echo "Css indent script"
 
 if exists("b:did_indent")
   finish
