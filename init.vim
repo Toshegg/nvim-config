@@ -1,5 +1,8 @@
+let g:python_host_prog = '/Users/toshegg/.pyenv/versions/neovim2/bin/python'
+let g:python3_host_prog = '/Users/toshegg/.pyenv/versions/neovim3/bin/python'
+
 set langmenu=en_US.UTF-8
-set encoding=utf8
+set encoding=UTF-8
 let $LANG = 'en_US'
 syntax enable
 set autoindent
@@ -13,7 +16,13 @@ set tabstop=2 shiftwidth=2 expandtab
 set incsearch
 filetype plugin indent on
 filetype plugin on
+set omnifunc=syntaxcomplete#Complete
 set noic
+
+checktime 2
+set autoread
+au CursorHold * checktime
+au FocusGained * checktime
 
 set spelllang=en
 set spellfile=~/.config/nvim/spell/en.utf-8.add
@@ -29,6 +38,7 @@ Plug 'scrooloose/nerdtree'
 " colorscheme
 Plug 'junegunn/seoul256.vim'
 Plug 'rafi/awesome-vim-colorschemes'
+Plug 'arcticicestudio/nord-vim'
 
 " indent guides
 Plug 'nathanaelkane/vim-indent-guides'
@@ -60,7 +70,9 @@ Plug 'mileszs/ack.vim'
 
 " Supertab (autocomplete)
 Plug 'ervandew/supertab'
-Plug 'Valloric/YouCompleteMe'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'Shougo/neco-syntax'
+Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 
 " Save session
 Plug 'xolox/vim-session'
@@ -77,7 +89,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdcommenter'
 
 " CSS3
-Plug 'hail2u/vim-css3-syntax'
+"Plug 'hail2u/vim-css3-syntax'
 
 " Auto close tags
 Plug 'alvan/vim-closetag'
@@ -88,9 +100,6 @@ Plug 'mattn/emmet-vim'
 " Snippets
 Plug 'SirVer/ultisnips'
 
-" Javascript
-"Plug 'pangloss/vim-javascript'
-
 " Surround
 Plug 'tpope/vim-surround'
 
@@ -100,12 +109,11 @@ Plug 'tpope/vim-repeat'
 " Swift support
 Plug 'keith/swift.vim'
 
-" Plug 'bling/vim-bufferline'
 
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
+Plug 'posva/vim-vue', { 'branch': 'performance-enhancement' }
 
 Plug 'isRuslan/vim-es6'
-"Plug 'othree/yajs.vim'
 "
 Plug 'chrisbra/NrrwRgn'
 
@@ -123,10 +131,19 @@ Plug 'takac/vim-hardtime'
 Plug 'AndrewRadev/splitjoin.vim'
 
 Plug 'ternjs/tern_for_vim'
+
+Plug 'schickling/vim-bufonly'
+
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+
+Plug 'ap/vim-css-color'
+
+Plug 'brooth/far.vim'
 call plug#end()
 
 " colorscheme seoul256
 colorscheme hybrid_material
+" colorscheme nord
 set background=dark
 
 " Airline customization
@@ -158,11 +175,8 @@ hi IndentGuidesOdd  ctermbg=234
 hi IndentGuidesEven ctermbg=237
 let g:indent_guides_exclude_filetypes = ['nerdtree']
 
-" Toggle NERD Tree when open a directory
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
 nnoremap <leader>r :NERDTreeToggle<CR>
+map <leader>f :NERDTreeFind<cr>
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 
@@ -189,14 +203,13 @@ let g:session_directory='./'
 let g:session_default_name='Session'
 let g:session_autosave='yes'
 let g:session_autosave_periodic=1
+let g:session_autoload='no'
 
 " Easymotion settings
 
 map <Leader> <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
-map  n <Plug>(easymotion-next)
-map  N <Plug>(easymotion-prev)
 let g:EasyMotion_enter_jump_first = 1
 let g:EasyMotion_smartcase = 1
 
@@ -205,8 +218,18 @@ vmap <C-c> "+y
 vmap <C-x> "+d
 
 let g:neomake_javascript_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+let g:neomake_vue_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+let g:neomake_html_eslint_maker = {
+        \ 'args': ['--format=compact'],
+        \ 'errorformat': '%E%f: line %l\, col %c\, Error - %m,' .
+        \   '%W%f: line %l\, col %c\, Warning - %m,%-G,%-G%*\d problems%#',
+        \ 'cwd': '%:p:h',
+        \ }
+let g:neomake_html_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
 autocmd BufEnter,BufWritePost * Neomake
 let g:neomake_javascript_enabled_makers = ['eslint']
+let g:neomake_vue_enabled_makers = ['eslint']
+let g:neomake_html_enabled_makers = ['eslint']
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -231,28 +254,19 @@ let g:UltiSnipsEnableSnipMate = 0
 let g:UltiSnipsEditSplit="vertical"
 
 " Remove trailing spaces automatically
-autocmd BufWritePre * %s/\s\+$//e
+fun! TrimWhitespace()
+  let l:save = winsaveview()
+  %s/\s\+$//e
+  call winrestview(l:save)
+endfun
+autocmd BufWritePre * :call TrimWhitespace()
 
 " Support of embedded js and css syntax
-autocmd BufRead,BufNewFile *.html setlocal filetype=html.javascript.css
 autocmd BufEnter * :syntax sync fromstart
 
-" Folding
-augroup javascript.html.css
-  au!
-  au FileType html.javascript.css setlocal foldmethod=marker
-  au FileType html.javascript.css setlocal foldmarker={,}
-  au FileType html.javascript.css setlocal foldlevel=99
-  au FileType html.javascript.css setlocal foldminlines=3
-augroup END
-nmap <leader>f :set foldlevel=2<CR>
-nmap <leader>u :set foldlevel=99<CR>
-
-"augroup javascript
-  "au!
-  "au FileType javascript setlocal foldmethod=syntax
-  "au FileType javascript setlocal foldminlines=3
-"augroup END
+" Prettier conf
+let g:prettier#autoformat = 0
+let g:prettier#config#trailing_comma = 'none'
 
 set iskeyword+=\-
 
@@ -265,13 +279,8 @@ map y <Plug>(operator-flashy)
 nmap Y <Plug>(operator-flashy)$
 hi Flashy ctermbg=red
 
-" Autosave and autoread
-"set autoread
-"au FocusGained,BufEnter * :silent! checktime
-"au FocusLost,WinLeave * :silent! w
-
 " YouCompleteMe opts
-set completeopt-=preview
+"set completeopt-=preview
 
 nnoremap <c-i> :InlineEdit<CR>
 let g:inline_edit_proxy_type = 'tempfile'
@@ -298,3 +307,22 @@ augroup Binary
 augroup END
 
 vnoremap <leader>ch dO<!--<CR>--><ESC>P
+
+let g:AutoPairsMultilineClose = 0
+let g:AutoPairsFlyMode = 0
+
+" Deoplete opts
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#sources#ternjs#filetypes = [
+                \ 'html',
+                \ 'vue'
+                \ ]
+let g:SuperTabDefaultCompletionType = "<c-n>"
+
+" Polyglot settings
+let g:polyglot_disabled = ['vue']
+
+" GReplace settings
+set grepprg=ag
+
+let g:grep_cmd_opts = '--line-numbers --noheading'
