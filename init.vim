@@ -8,7 +8,7 @@ set encoding=UTF-8
 let $LANG = 'en_US'
 set spelllang=en
 set spellfile=~/.config/nvim/spell/en.utf-8.add
-set spell
+" set spell
 
 " Basic settings
 syntax enable
@@ -20,6 +20,7 @@ set so=999
 set cursorline
 set lazyredraw
 set incsearch
+set shiftround
 filetype plugin indent on
 filetype plugin on
 filetype indent on
@@ -27,8 +28,9 @@ set omnifunc=syntaxcomplete#Complete
 set noic
 checktime 2
 set autoread
-au CursorHold * checktime
-au FocusGained * checktime
+au CursorHold * silent! checktime
+au FocusGained * silent! checktime
+set termguicolors
 
 " Set correct indents for inline script and style tags
 let g:html_indent_script1 = "inc"
@@ -44,12 +46,6 @@ Plug 'scrooloose/nerdtree'
 Plug 'junegunn/seoul256.vim'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'arcticicestudio/nord-vim'
-
-" indent guides
-Plug 'nathanaelkane/vim-indent-guides'
-
-" Vim auto pairs
-Plug 'jiangmiao/auto-pairs'
 
 " Easymotion
 Plug 'easymotion/vim-easymotion'
@@ -70,6 +66,10 @@ Plug 'mileszs/ack.vim'
 " Supertab (autocomplete)
 Plug 'ervandew/supertab'
 
+" Typescript
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
+
 " Deoplete
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'Shougo/neco-syntax'
@@ -86,7 +86,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdcommenter'
 
 " CSS3
-"Plug 'hail2u/vim-css3-syntax'
+Plug 'hail2u/vim-css3-syntax'
 Plug 'JulesWang/css.vim'
 
 " Auto close tags
@@ -112,10 +112,6 @@ Plug 'posva/vim-vue', { 'branch': 'performance-enhancement' }
 
 Plug 'isRuslan/vim-es6'
 
-" Highlight a line when yanking
-Plug 'kana/vim-operator-user'
-Plug 'haya14busa/vim-operator-flashy'
-
 " Icons for NERDTree, airline etc.
 Plug 'ryanoasis/vim-devicons'
 
@@ -135,14 +131,31 @@ Plug 'ap/vim-css-color'
 
 " Search and replace in multiple files
 Plug 'brooth/far.vim'
+
+Plug 'Yggdroot/indentLine'
+
+Plug 'embear/vim-localvimrc'
+
+Plug 'kamykn/spelunker.vim'
+
+Plug 'osyo-manga/vim-over'
+
+Plug 'romainl/vim-cool'
 call plug#end()
 
 " Set coloscheme
-colorscheme hybrid_material
+"colorscheme hybrid_material
+colorscheme nord
+let g:nord_comment_brightness = 10
+let g:gruvbox_guisp_fallback = "bg"
+"colorscheme gruvbox
 set background=dark
+hi Special guifg=#5E81AC
+hi Identifier guifg=#81A1C1
 
 " Airline customization
-let g:airline_theme="deus"
+"let g:airline_theme="gruvbox"
+let g:airline_theme="nord"
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#neomake#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
@@ -156,13 +169,6 @@ let g:airline#extensions#tabline#switch_buffers_and_tabs = 0
 let g:airline#extensions#tabline#tab_nr_type = 3
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#whitespace#mixed_indent_algo = 1
-
-" Indent guides settings
-let g:indent_guides_auto_colors = 0
-let g:indent_guides_enable_on_vim_startup = 1
-hi IndentGuidesOdd  ctermbg=234
-hi IndentGuidesEven ctermbg=237
-let g:indent_guides_exclude_filetypes = ['nerdtree']
 
 " NerdTREE settings
 nnoremap <leader>r :NERDTreeToggle<CR>
@@ -182,6 +188,11 @@ nnoremap <C-k> gt
 
 " Emmet settings
 let g:user_emmet_leader_key='<C-s>'
+let g:user_emmet_settings = {
+\  'javascript.jsx': {
+\      'extends' : 'jsx',
+\  }
+\}
 
 " Buffers switching
 nnoremap <C-h> :bprevious<CR>
@@ -191,6 +202,7 @@ nnoremap <C-l> :bnext<CR>
 map <Leader> <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
+
 let g:EasyMotion_enter_jump_first = 1
 let g:EasyMotion_smartcase = 1
 
@@ -208,10 +220,18 @@ let g:neomake_html_eslint_maker = {
         \ 'cwd': '%:p:h',
         \ }
 let g:neomake_html_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+
+let g:neomake_typescript_tslint_maker = {
+      \ 'args': ['%:p'],
+      \ 'errorformat': '%EERROR: %f[%l\, %c]: %m,%E%f[%l\, %c]: %m',
+      \ 'cwd': '%:p:h',
+      \ }
+
 autocmd BufEnter,BufWritePost * Neomake
 let g:neomake_javascript_enabled_makers = ['eslint']
 let g:neomake_vue_enabled_makers = ['eslint']
 let g:neomake_html_enabled_makers = ['eslint']
+let g:neomake_typescript_enabled_makers = ['tslint']
 
 " Add warning to statusline
 set statusline+=%#warningmsg#
@@ -222,9 +242,11 @@ set statusline+=%*
 set updatetime=250
 
 " CtrlP settings
+let g:ctrlp_mruf_relative = 1
 let g:ctrlp_max_files=0
 let g:ctrlp_max_depth=40
 let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_working_path_mode = 'r'
 
 " UltiSnips configuration
 let g:UltiSnipsExpandTrigger = "<c-e>"
@@ -248,7 +270,7 @@ autocmd BufEnter * :syntax sync fromstart
 
 " Prettier conf
 let g:prettier#autoformat = 0
-let g:prettier#config#trailing_comma = 'none'
+"let g:prettier#config#trailing_comma = 'none'
 
 " Words with dashes as a single word
 set iskeyword+=\-
@@ -256,11 +278,6 @@ set iskeyword+=\-
 " Use ag with ack.vim
 let g:ackprg = 'ag --nogroup --nocolor --column'
 nnoremap <Leader>a :Ack!<Space>
-
-" Flashy y
-map y <Plug>(operator-flashy)
-nmap Y <Plug>(operator-flashy)$
-hi Flashy ctermbg=red
 
 " InlineEdit settings
 nnoremap <c-i> :InlineEdit<CR>
@@ -284,12 +301,7 @@ augroup Binary
   au BufWritePost *.bin,*.ico,*.png,*.jpg set nomod | endif
 augroup END
 
-" Comment html
-vnoremap <leader>ch dO<!--<CR>--><ESC>P
-
-" Autopairs settings
-let g:AutoPairsMultilineClose = 0
-let g:AutoPairsFlyMode = 0
+inoremap <C-j> <CR><CR><C-o>k<Tab>
 
 " Deoplete opts
 let g:deoplete#enable_at_startup = 1
@@ -300,4 +312,33 @@ let g:deoplete#sources#ternjs#filetypes = [
 let g:SuperTabDefaultCompletionType = "<c-n>"
 
 " Polyglot settings
-let g:polyglot_disabled = ['vue']
+let g:polyglot_disabled = ['vue', 'typescript']
+
+" Map H J
+nnoremap H ^
+nnoremap L $
+nnoremap dL d$
+nnoremap dH d^
+
+" Open vimrc in split
+nnoremap <leader>ev :vsplit $MYVIMRC<CR>
+
+" Insert mode end of line
+inoremap <C-l> <C-o>$
+
+" Indents
+let g:indentLine_char = '⎸'
+let g:indentLine_leadingSpaceChar = '·'
+let g:indentLine_bufNameExclude = ['NERD_tree.*']
+
+let g:vim_markdown_conceal = 0
+
+" Local vimrc whitelist
+let g:localvimrc_whitelist='/Users/toshegg/code/analyste/b-sharp-ui/.*'
+
+" Map c-i to import for typescript
+au FileType typescript nnoremap <leader>i :TSImport<CR>
+au FileType typescript nnoremap <leader>o :TSDef<CR>
+
+let g:spelunker_spell_bad_group = 'SpellBad'
+nnoremap <leader>s :OverCommandLine %s/<cr>
