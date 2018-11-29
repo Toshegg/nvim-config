@@ -54,14 +54,12 @@ Plug 'easymotion/vim-easymotion'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
-" CtrlP
-Plug 'ctrlpvim/ctrlp.vim'
+" Fzf
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 " Fugitive
 Plug 'tpope/vim-fugitive'
-
-" Ack (search)
-Plug 'mileszs/ack.vim'
 
 " Supertab (autocomplete)
 Plug 'ervandew/supertab'
@@ -194,10 +192,6 @@ let g:user_emmet_settings = {
 \  }
 \}
 
-" Buffers switching
-nnoremap <C-h> :bprevious<CR>
-nnoremap <C-l> :bnext<CR>
-
 " Easymotion settings
 map <Leader> <Plug>(easymotion-prefix)
 map  / <Plug>(easymotion-sn)
@@ -233,20 +227,33 @@ let g:neomake_vue_enabled_makers = ['eslint']
 let g:neomake_html_enabled_makers = ['eslint']
 let g:neomake_typescript_enabled_makers = ['tslint']
 
-" Add warning to statusline
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
 " Set updatetime
 set updatetime=250
 
-" CtrlP settings
-let g:ctrlp_mruf_relative = 1
-let g:ctrlp_max_files=0
-let g:ctrlp_max_depth=40
-let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-let g:ctrlp_working_path_mode = 'r'
+" FZF setup
+nnoremap <C-p> :GFiles<CR>
+nnoremap <C-f> :FZF<CR>
+nnoremap <C-b> :Buffers<CR>
+nnoremap <C-h> :History<CR>
+nnoremap <C-l> :Line<CR>
+nnoremap <Leader>a :Ag<CR>
+autocmd! FileType fzf
+autocmd  FileType fzf set laststatus=0 noshowmode noruler
+  \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
 
 " UltiSnips configuration
 let g:UltiSnipsExpandTrigger = "<c-e>"
@@ -274,10 +281,6 @@ let g:prettier#autoformat = 0
 
 " Words with dashes as a single word
 set iskeyword+=\-
-
-" Use ag with ack.vim
-let g:ackprg = 'ag --nogroup --nocolor --column'
-nnoremap <Leader>a :Ack!<Space>
 
 " InlineEdit settings
 nnoremap <c-i> :InlineEdit<CR>
@@ -314,17 +317,9 @@ let g:SuperTabDefaultCompletionType = "<c-n>"
 " Polyglot settings
 let g:polyglot_disabled = ['vue', 'typescript']
 
-" Map H J
-nnoremap H ^
-nnoremap L $
-nnoremap dL d$
-nnoremap dH d^
-
 " Open vimrc in split
 nnoremap <leader>ev :vsplit $MYVIMRC<CR>
-
-" Insert mode end of line
-inoremap <C-l> <C-o>$
+nnoremap <leader>en :vsplit ~/.config/nvim/notes<CR>
 
 " Indents
 let g:indentLine_char = '⎸'

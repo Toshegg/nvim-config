@@ -1,0 +1,9 @@
+Find replace
+* :Ag foo then enter
+* alt-a to select items (if using iTerm2 on macOS, you need Esc+ turned on for alt/option keys)
+* enter to populate quickfix list with selected items
+* :cfdo %s/foo/bar/g | update
+
+Far.vim usage
+:Far foo bar **/*.py
+:Fardo
