@@ -1,6 +1,6 @@
 " Python 2 and 3 paths
-let g:python_host_prog = '/Users/toshegg/.pyenv/versions/neovim2/bin/python'
-let g:python3_host_prog = '/Users/toshegg/.pyenv/versions/neovim3/bin/python'
+"let g:python_host_prog = '/Users/toshegg/.pyenv/versions/neovim2/bin/python'
+"let g:python3_host_prog = '/Users/toshegg/.pyenv/versions/neovim3/bin/python'
 
 " Set spell check
 set langmenu=en_US.UTF-8
@@ -15,9 +15,8 @@ syntax enable
 set autoindent
 set smartindent
 set tabstop=2 shiftwidth=2 expandtab
-set number relativenumber
+set number
 set so=999
-set cursorline
 set lazyredraw
 set incsearch
 set shiftround
@@ -31,6 +30,9 @@ set autoread
 au CursorHold * silent! checktime
 au FocusGained * silent! checktime
 set termguicolors
+set ttyfast
+let mapleader=" "
+set undofile
 
 " Set correct indents for inline script and style tags
 let g:html_indent_script1 = "inc"
@@ -74,8 +76,9 @@ Plug 'Shougo/neco-syntax'
 Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 
 " Syntax check
-Plug 'neomake/neomake'
-Plug 'jaawerth/nrun.vim'
+"Plug 'neomake/neomake'
+"Plug 'jaawerth/nrun.vim'
+Plug 'w0rp/ale'
 
 " Git diff
 Plug 'airblade/vim-gitgutter'
@@ -139,6 +142,8 @@ Plug 'kamykn/spelunker.vim'
 Plug 'osyo-manga/vim-over'
 
 Plug 'romainl/vim-cool'
+
+Plug 'benmills/vimux'
 call plug#end()
 
 " Set coloscheme
@@ -155,7 +160,8 @@ hi Identifier guifg=#81A1C1
 "let g:airline_theme="gruvbox"
 let g:airline_theme="nord"
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#neomake#enabled = 1
+"let g:airline#extensions#neomake#enabled = 1
+let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#show_tabs = 1
 let g:airline#extensions#tabline#show_buffers = 0
@@ -168,10 +174,9 @@ let g:airline#extensions#tabline#tab_nr_type = 3
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#whitespace#mixed_indent_algo = 1
 
-" NerdTREE settings
+" NERDTree settings
 nnoremap <leader>r :NERDTreeToggle<CR>
 map <leader>f :NERDTreeFind<cr>
-let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let g:NERDTreeMapJumpNextSibling = ''
 let g:NERDTreeMapJumpPrevSibling = ''
@@ -204,35 +209,41 @@ let g:EasyMotion_smartcase = 1
 vmap <C-c> "+y
 vmap <C-x> "+d
 
+let g:ale_linters = {'typescript': ['tslint', 'tsserver']}
+nnoremap <Leader>ln :ALENext<CR>
+nnoremap <Leader>lp :ALEPrevious<CR>
+nnoremap <Leader>lf :ALEFix<CR>
+
 " Neomake settings
-let g:neomake_javascript_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
-let g:neomake_vue_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
-let g:neomake_html_eslint_maker = {
-        \ 'args': ['--format=compact'],
-        \ 'errorformat': '%E%f: line %l\, col %c\, Error - %m,' .
-        \   '%W%f: line %l\, col %c\, Warning - %m,%-G,%-G%*\d problems%#',
-        \ 'cwd': '%:p:h',
-        \ }
-let g:neomake_html_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
-
-let g:neomake_typescript_tslint_maker = {
-      \ 'args': ['%:p'],
-      \ 'errorformat': '%EERROR: %f[%l\, %c]: %m,%E%f[%l\, %c]: %m',
-      \ 'cwd': '%:p:h',
-      \ }
-
-autocmd BufEnter,BufWritePost * Neomake
-let g:neomake_javascript_enabled_makers = ['eslint']
-let g:neomake_vue_enabled_makers = ['eslint']
-let g:neomake_html_enabled_makers = ['eslint']
-let g:neomake_typescript_enabled_makers = ['tslint']
+" let g:neomake_javascript_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+" let g:neomake_vue_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+" let g:neomake_html_eslint_maker = {
+"         \ 'args': ['--format=compact'],
+"         \ 'errorformat': '%E%f: line %l\, col %c\, Error - %m,' .
+"         \   '%W%f: line %l\, col %c\, Warning - %m,%-G,%-G%*\d problems%#',
+"         \ 'cwd': '%:p:h',
+"         \ }
+" let g:neomake_html_eslint_exe = system('PATH=$(npm bin):$PATH && which eslint | tr -d "\n"')
+"
+" let g:neomake_typescript_tslint_maker = {
+"       \ 'args': ['%:p'],
+"       \ 'errorformat': '%EERROR: %f[%l\, %c]: %m,%E%f[%l\, %c]: %m',
+"       \ 'cwd': '%:p:h',
+"       \ }
+"
+" autocmd BufEnter,BufWritePost * Neomake
+" let g:neomake_javascript_enabled_makers = ['eslint']
+" let g:neomake_vue_enabled_makers = ['eslint']
+" let g:neomake_html_enabled_makers = ['eslint']
+" let g:neomake_typescript_enabled_makers = ['tslint']
 
 " Set updatetime
 set updatetime=250
 
 " FZF setup
-nnoremap <C-p> :GFiles<CR>
-nnoremap <C-f> :FZF<CR>
+nnoremap <C-p> :GFiles --others --exclude-standard --cached<CR>
+nnoremap <C-f> :GFiles?<CR>
+nnoremap <C-a> :Files<CR>
 nnoremap <C-b> :Buffers<CR>
 nnoremap <C-h> :History<CR>
 nnoremap <C-l> :Line<CR>
@@ -254,6 +265,16 @@ let g:fzf_colors =
   \ 'marker':  ['fg', 'Keyword'],
   \ 'spinner': ['fg', 'Label'],
   \ 'header':  ['fg', 'Comment'] }
+
+command! -bang -nargs=* GFiles
+  \ call fzf#vim#gitfiles(<q-args>, <bang>0 ? fzf#vim#with_preview('up:60%')
+  \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \                 <bang>0)
+command! -bang -nargs=* Ag
+  \ call fzf#vim#ag(<q-args>,
+  \                 <bang>0 ? fzf#vim#with_preview('up:60%')
+  \                         : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \                 <bang>0)
 
 " UltiSnips configuration
 let g:UltiSnipsExpandTrigger = "<c-e>"
@@ -324,12 +345,13 @@ nnoremap <leader>en :vsplit ~/.config/nvim/notes<CR>
 " Indents
 let g:indentLine_char = '⎸'
 let g:indentLine_leadingSpaceChar = '·'
-let g:indentLine_bufNameExclude = ['NERD_tree.*']
+let g:indentLine_bufNameExclude = ['_.*', 'NERD_tree.*', '.*\.txt']
 
 let g:vim_markdown_conceal = 0
 
 " Local vimrc whitelist
 let g:localvimrc_whitelist='/Users/toshegg/code/analyste/b-sharp-ui/.*'
+let g:localvimrc_sandbox = 0
 
 " Map c-i to import for typescript
 au FileType typescript nnoremap <leader>i :TSImport<CR>
@@ -337,3 +359,7 @@ au FileType typescript nnoremap <leader>o :TSDef<CR>
 
 let g:spelunker_spell_bad_group = 'SpellBad'
 nnoremap <leader>s :OverCommandLine %s/<cr>
+
+" Nvim-typescript settings
+let g:nvim_typescript#diagnostics_enable = 0
+
